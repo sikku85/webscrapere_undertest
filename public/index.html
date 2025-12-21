@@ -211,6 +211,12 @@
                 const res = await fetch('/api/stats');
                 const data = await res.json();
 
+                // Online state restoration
+                document.querySelector('.scanner-line').style.display = 'block';
+                document.getElementById('statusBadge').textContent = 'Active';
+                document.getElementById('statusBadge').style.background = '#e6f4ea';
+                document.getElementById('statusBadge').style.color = '#137333';
+
                 document.getElementById('totalLinks').textContent = data.totalLinks;
                 document.getElementById('lastDuration').textContent = data.lastRunDuration ? data.lastRunDuration + ' ms' : 'N/A';
                 document.getElementById('telegramStatus').textContent = data.telegramConfigured ? '✅ Configured' : '❌ Not Configured';
@@ -226,6 +232,8 @@
 
             } catch (e) {
                 console.error(e);
+                // Offline state
+                document.querySelector('.scanner-line').style.display = 'none';
                 document.getElementById('statusBadge').textContent = 'Offline';
                 document.getElementById('statusBadge').style.background = '#fce8e6';
                 document.getElementById('statusBadge').style.color = '#c5221f';
