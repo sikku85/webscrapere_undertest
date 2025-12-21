@@ -1,0 +1,20 @@
+{
+  "name": "sarkari-scraper",
+  "version": "1.0.0",
+  "description": "Scraper for SarkariResult.com.cm with Telegram notifications",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node test_scraper.js"
+  },
+  "dependencies": {
+    "axios": "^1.6.0",
+    "cheerio": "^1.0.0-rc.12",
+    "dotenv": "^16.3.1",
+    "express": "^5.2.1",
+    "mongoose": "^9.0.2",
+    "node-cron": "^3.0.3",
+    "node-telegram-bot-api": "^0.64.0"
+  }
+}
