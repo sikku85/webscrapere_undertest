@@ -114,8 +114,9 @@ async function run() {
 log('Starting Sarkari Scraper Service (MongoDB Mode)...');
 initDB().then(() => run());
 
-cron.schedule('* * * * *', () => {
+cron.schedule('*/2 * * * *', () => {
     run();
 });
+
 
 
