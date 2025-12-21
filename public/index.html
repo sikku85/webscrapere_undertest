@@ -1,33 +1,184 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Sarkari Scraper Status</title>
     <style>
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: #f0f2f5; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 800px; margin: 0 auto; background: white; padding: 30px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-        h1 { margin-top: 0; color: #1a73e8; display: flex; align-items: center; gap: 10px; }
-        .status-badge { background: #e6f4ea; color: #137333; padding: 6px 12px; border-radius: 20px; font-size: 0.9rem; font-weight: 600; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px; margin: 30px 0; }
-        .card { background: #f8f9fa; padding: 20px; border-radius: 8px; border: 1px solid #e1e4e8; }
-        .card h3 { margin: 0 0 10px 0; font-size: 0.9rem; color: #5f6368; text-transform: uppercase; letter-spacing: 0.5px; }
-        .card .value { font-size: 2rem; font-weight: 700; color: #202124; }
-        .refresh-btn { background: #1a73e8; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-size: 1rem; transition: background 0.2s; }
-        .refresh-btn:hover { background: #1557b0; }
-        #lastUpdated { font-size: 0.9rem; color: #666; margin-top: 20px; }
-        .log-container { margin-top: 30px; background: #202124; color: #a8c7fa; padding: 15px; border-radius: 8px; font-family: monospace; height: 200px; overflow-y: auto; }
-        .log-entry { margin-bottom: 5px; border-bottom: 1px solid #3c4043; padding-bottom: 5px; }
-        .log-time { color: #9aa0a6; font-size: 0.8rem; }
+        body {
+            font-family: 'Segoe UI', system-ui, sans-serif;
+            background: #f0f2f5;
+            margin: 0;
+            padding: 20px;
+            color: #333;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            margin-top: 0;
+            color: #1a73e8;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-badge {
+            background: #e6f4ea;
+            color: #137333;
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+            animation: pulse-green 2s infinite;
+        }
+
+        @keyframes pulse-green {
+            0% {
+                box-shadow: 0 0 0 0 rgba(19, 115, 51, 0.4);
+            }
+
+            70% {
+                box-shadow: 0 0 0 6px rgba(19, 115, 51, 0);
+            }
+
+            100% {
+                box-shadow: 0 0 0 0 rgba(19, 115, 51, 0);
+            }
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin: 30px 0;
+        }
+
+        .card {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e1e4e8;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 15px rgba(0, 0, 0, 0.1);
+            border-color: #d2e3fc;
+        }
+
+        .card h3 {
+            margin: 0 0 10px 0;
+            font-size: 0.9rem;
+            color: #5f6368;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .card .value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: #202124;
+        }
+
+        .refresh-btn {
+            background: #1a73e8;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: background 0.2s;
+        }
+
+        .refresh-btn:hover {
+            background: #1557b0;
+        }
+
+        #lastUpdated {
+            font-size: 0.9rem;
+            color: #666;
+            margin-top: 20px;
+        }
+
+        .log-container {
+            margin-top: 30px;
+            background: #202124;
+            color: #a8c7fa;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: monospace;
+            height: 200px;
+            overflow-y: auto;
+        }
+
+        .log-entry {
+            margin-bottom: 5px;
+            border-bottom: 1px solid #3c4043;
+            padding-bottom: 5px;
+        }
+
+        .log-time {
+            color: #9aa0a6;
+            font-size: 0.8rem;
+        }
+
+        .scanner-container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        .scanner-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(90deg, transparent, #1a73e8, #8ab4f8, #1a73e8, transparent);
+            box-shadow: 0 0 15px rgba(26, 115, 232, 0.8), 0 0 5px rgba(26, 115, 232, 0.5);
+            animation: scan 2.5s cubic-bezier(0.4, 0.0, 0.2, 1) infinite alternate;
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes scan {
+            0% {
+                top: 0;
+            }
+
+            100% {
+                top: 100%;
+            }
+        }
+
+        .container {
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Ensure scan line stays inside */
     </style>
 </head>
+
 <body>
     <div class="container">
+        <div class="scanner-line"></div>
         <h1>
             Sarkari Scraper
             <span class="status-badge" id="statusBadge">Active</span>
         </h1>
-        <p>Monitoring sarkariresult.com.cm every 2 minutes.</p>
+        <p>Monitoring sarkariresult.com.cm every minute.</p>
 
         <div class="grid">
             <div class="card">
@@ -40,7 +191,8 @@
             </div>
             <div class="card">
                 <h3>Telegram Status</h3>
-                <div class="value" style="font-size: 1.2rem; display:flex; align-items:center; height: 38px;" id="telegramStatus">Checking...</div>
+                <div class="value" style="font-size: 1.2rem; display:flex; align-items:center; height: 38px;"
+                    id="telegramStatus">Checking...</div>
             </div>
         </div>
 
@@ -58,7 +210,7 @@
             try {
                 const res = await fetch('/api/stats');
                 const data = await res.json();
-                
+
                 document.getElementById('totalLinks').textContent = data.totalLinks;
                 document.getElementById('lastDuration').textContent = data.lastRunDuration ? data.lastRunDuration + ' ms' : 'N/A';
                 document.getElementById('telegramStatus').textContent = data.telegramConfigured ? '✅ Configured' : '❌ Not Configured';
@@ -71,7 +223,7 @@
                         ${log.message}
                     </div>
                 `).join('');
-                
+
             } catch (e) {
                 console.error(e);
                 document.getElementById('statusBadge').textContent = 'Offline';
@@ -85,4 +237,5 @@
         setInterval(fetchStats, 10000);
     </script>
 </body>
+
 </html>
