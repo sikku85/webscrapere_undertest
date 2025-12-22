@@ -5,6 +5,7 @@ import { fileURLToPath } from 'url';
 import { scrapeSarkariResult } from './scraper.js';
 import { initDB, loadState, saveNewLinks, filterNewItems, updateState } from './storage.js';
 import { sendNotification } from './notifier.js';
+import cron from 'node-cron';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -124,11 +125,10 @@ async function run() {
 }
 
 // Schedule
-log('Starting Sarkari Scraper Service (MongoDB Mode)...');
-initDB().then(() => {
-    run(); // Initial run
-    setInterval(run, 1 * 60 * 1000); // Run every 2 minutes
+cron.schedule('*/2 * * * *', () => {
+    run();
 });
+
 
 
 
