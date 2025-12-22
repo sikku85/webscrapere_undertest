@@ -125,7 +125,7 @@ async function run() {
 }
 
 // Schedule
-cron.schedule('*/2 * * * *', () => {
+cron.schedule('* * * * *', () => {
     run();
 });
 
