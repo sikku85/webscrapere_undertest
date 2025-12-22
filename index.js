@@ -1,49 +1,31 @@
 
 import express from 'express';
-import path from 'path';
-import { fileURLToPath } from 'url';
 import { scrapeSarkariResult } from './scraper.js';
 import { initDB, loadState, saveNewLinks, filterNewItems, updateState } from './storage.js';
 import { sendNotification } from './notifier.js';
 import cron from 'node-cron';
 
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
-
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-// In-memory stats for dashboard
+// In-memory stats for basic health check
 let stats = {
-    totalLinks: 0,
+    lastRun: null,
     lastRunDuration: 0,
-    telegramConfigured: !!process.env.TELEGRAM_BOT_TOKEN,
     dbConnected: false,
-    logs: [] 
+    itemsFoundLastRun: 0
 };
 
 function log(message) {
-    const entry = { timestamp: Date.now(), message };
-    console.log(message);
-    stats.logs.unshift(entry);
-    if (stats.logs.length > 50) stats.logs.pop();
+    console.log(`[${new Date().toISOString()}] ${message}`);
 }
 
-app.use(express.static(path.join(__dirname, 'public')));
-
-app.get('/api/stats', async (req, res) => {
-    // Refresh stats
-    try {
-        const state = await loadState();
-        stats.totalLinks = state.seenLinks.length;
-    } catch(e) {}
-    res.json(stats);
-});
-
-app.get('/api/trigger', async (req, res) => {
-    log('Manual trigger received');
-    await run();
-    res.json({ success: true });
+app.get('/', (req, res) => {
+    res.json({
+        status: 'active',
+        message: 'SarkariResult Scraper Backend is running.',
+        stats
+    });
 });
 
 app.listen(PORT, () => {
@@ -67,6 +49,7 @@ async function run() {
     if (!data || ((!data.results.length) && (!data.latestJobs.length))) {
         log('Scrape warning: No data found.');
         stats.lastRunDuration = Date.now() - start;
+        stats.lastRun = new Date();
         return;
     }
 
@@ -121,14 +104,13 @@ async function run() {
         log('No new items found.');
     }
     
+    stats.itemsFoundLastRun = newLinksFound;
     stats.lastRunDuration = Date.now() - start;
+    stats.lastRun = new Date();
 }
 
-// Schedule
+// Schedule - Runs every minute
 cron.schedule('* * * * *', () => {
     run();
 });
-
-
-
 
