@@ -1,4 +1,4 @@
-import cron from 'node-cron';
+
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -125,10 +125,9 @@ async function run() {
 
 // Schedule
 log('Starting Sarkari Scraper Service (MongoDB Mode)...');
-initDB().then(() => run());
-
-cron.schedule('*/2 * * * *', () => {
-    run();
+initDB().then(() => {
+    run(); // Initial run
+    setInterval(run, 1 * 60 * 1000); // Run every 2 minutes
 });
 
 
