@@ -91,8 +91,21 @@ async function run() {
                 updateState(state, newItems);
             } else {
                 for (const item of newItems) {
-                    await sendNotification(item, cat.label);
-                    log(`New Item: ${item.text}`);
+                    let shouldNotify = true;
+
+                    // Filter logic for Latest Jobs
+                    if (cat.key === 'latestJobs') {
+                        const lowerText = (item.text || '').toLowerCase();
+                        if (lowerText.includes('last date')) {
+                            shouldNotify = false;
+                            log(`Skipping notification for: ${item.text}`);
+                        }
+                    }
+
+                    if (shouldNotify) {
+                        await sendNotification(item, cat.label);
+                        log(`New Item: ${item.text}`);
+                    }
                 }
                 // Save to DB
                 await saveNewLinks(newItems, cat.label);
@@ -114,7 +127,7 @@ async function run() {
 log('Starting Sarkari Scraper Service (MongoDB Mode)...');
 initDB().then(() => run());
 
-cron.schedule('*/2 * * * *', () => {
+cron.schedule('* * * * *', () => {
     run();
 });
 
