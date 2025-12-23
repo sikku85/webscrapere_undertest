@@ -1,5 +1,9 @@
 
 import express from 'express';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { scrapeSarkariResult } from './scraper.js';
 import { initDB, loadState, saveNewLinks, filterNewItems, updateState } from './storage.js';
 import { sendNotification } from './notifier.js';
@@ -16,21 +20,48 @@ let stats = {
     itemsFoundLastRun: 0
 };
 
+const logs = [];
 function log(message) {
-    console.log(`[${new Date().toISOString()}] ${message}`);
+    const msg = `[${new Date().toISOString()}] ${message}`;
+    console.log(msg);
+    logs.unshift(msg); // Add to beginning
+    if (logs.length > 50) logs.pop(); // Keep last 50
 }
 
-app.get('/', (req, res) => {
+app.use(express.static(path.join(__dirname, 'public')));
+
+app.get('/api/status', (req, res) => {
     res.json({
         status: 'active',
         message: 'SarkariResult Scraper Backend is running.',
-        stats
+        stats,
+        logs
     });
 });
 
-app.listen(PORT, () => {
-    console.log(`Server running on http://localhost:${PORT}`);
+app.get('/api/trigger', async (req, res) => {
+    log('Vercel Cron trigger received');
+    try {
+        await run();
+        res.json({ success: true, message: 'Scraper run completed' });
+    } catch (error) {
+        console.error('Scraper run failed:', error);
+        res.status(500).json({ success: false, error: error.message });
+    }
 });
+
+// Vercel requires exporting the app
+export default app;
+
+if (process.env.NODE_ENV !== 'production') {
+    app.listen(PORT, () => {
+        console.log(`Server running on http://localhost:${PORT}`);
+        
+        // Start Cron Job
+        log('Starting cron job: */1 * * * *');
+        cron.schedule('*/1 * * * *', run);
+    });
+}
 
 async function run() {
     log('Running scraper job...');
@@ -108,9 +139,4 @@ async function run() {
     stats.lastRunDuration = Date.now() - start;
     stats.lastRun = new Date();
 }
-
-// Schedule - Runs every minute
-cron.schedule('* * * * *', () => {
-    run();
-});
 
