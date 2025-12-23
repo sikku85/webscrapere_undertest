@@ -107,19 +107,43 @@ export async function getDailyStats() {
         
         const stats = await Link.aggregate([
             { $match: { dateFound: { $gte: startOfDay } } },
-            { $group: { _id: "$category", count: { $sum: 1 } } }
+            { 
+                $group: { 
+                    _id: "$category", 
+                    count: { $sum: 1 },
+                    items: { $push: { text: "$text", url: "$url" } }
+                } 
+            }
         ]);
         
-        const result = { latestJobs: 0, admitCards: 0, results: 0 };
+        const result = { 
+            latestJobs: { count: 0, items: [] }, 
+            admitCards: { count: 0, items: [] }, 
+            results: { count: 0, items: [] } 
+        };
+
         stats.forEach(s => {
-            if (s._id === 'Latest Job') result.latestJobs = s.count;
-            if (s._id === 'Admit Card') result.admitCards = s.count;
-            if (s._id === 'Result') result.results = s.count;
+            if (s._id === 'Latest Job') {
+                result.latestJobs.count = s.count;
+                result.latestJobs.items = s.items;
+            }
+            if (s._id === 'Admit Card') {
+                result.admitCards.count = s.count;
+                result.admitCards.items = s.items;
+            }
+            if (s._id === 'Result') {
+                result.results.count = s.count;
+                result.results.items = s.items;
+            }
         });
         
         return result;
     } catch (error) {
         console.error('Error fetching daily stats:', error);
-        return { latestJobs: 0, admitCards: 0, results: 0 };
+        return { 
+            latestJobs: { count: 0, items: [] }, 
+            admitCards: { count: 0, items: [] }, 
+            results: { count: 0, items: [] } 
+        };
     }
 }

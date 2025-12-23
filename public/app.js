@@ -10,6 +10,13 @@ const dailyJobsEl = document.getElementById('daily-jobs');
 const dailyAdmitEl = document.getElementById('daily-admit');
 const dailyResultsEl = document.getElementById('daily-results');
 
+// Modal Elements
+const modal = document.getElementById('details-modal');
+const modalTitle = document.getElementById('modal-title');
+const modalList = document.getElementById('modal-list');
+const closeBtn = document.querySelector('.close-btn');
+
+let currentStats = null; // Store full stats for click handlers
 let isRunning = false;
 
 function formatTime(isoString) {
@@ -41,9 +48,10 @@ async function fetchStatus() {
 
         // Update Daily Stats
         if (data.dailyStats) {
-            dailyJobsEl.textContent = data.dailyStats.latestJobs || 0;
-            dailyAdmitEl.textContent = data.dailyStats.admitCards || 0;
-            dailyResultsEl.textContent = data.dailyStats.results || 0;
+            currentStats = data.dailyStats; // Store globally
+            dailyJobsEl.textContent = data.dailyStats.latestJobs.count || 0;
+            dailyAdmitEl.textContent = data.dailyStats.admitCards.count || 0;
+            dailyResultsEl.textContent = data.dailyStats.results.count || 0;
         }
 
         // Update Logs
@@ -97,3 +105,47 @@ fetchStatus();
 
 // Poll every 2 seconds
 setInterval(fetchStatus, 2000);
+
+// Modal Logic
+function openModal(title, items) {
+    modalTitle.textContent = title;
+    modalList.innerHTML = '';
+    
+    if (!items || items.length === 0) {
+        modalList.innerHTML = '<li style="padding: 1.5rem; text-align: center; color: var(--text-secondary);">No items found today.</li>';
+    } else {
+        items.forEach(item => {
+            const li = document.createElement('li');
+            const a = document.createElement('a');
+            a.href = item.url;
+            a.target = '_blank';
+            a.textContent = item.text;
+            li.appendChild(a);
+            modalList.appendChild(li);
+        });
+    }
+    
+    modal.classList.add('show');
+}
+
+function closeModal() {
+    modal.classList.remove('show');
+}
+
+// Click Handlers for Stats
+document.querySelector('.daily-card:nth-child(1)').addEventListener('click', () => {
+    if (currentStats) openModal('New Jobs (Today)', currentStats.latestJobs.items);
+});
+
+document.querySelector('.daily-card:nth-child(2)').addEventListener('click', () => {
+    if (currentStats) openModal('Admit Cards (Today)', currentStats.admitCards.items);
+});
+
+document.querySelector('.daily-card:nth-child(3)').addEventListener('click', () => {
+    if (currentStats) openModal('Results (Today)', currentStats.results.items);
+});
+
+closeBtn.addEventListener('click', closeModal);
+window.addEventListener('click', (e) => {
+    if (e.target === modal) closeModal();
+});
