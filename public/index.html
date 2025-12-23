@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,7 +10,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
+
 <body>
+    <div class="scanner-line"></div>
     <div class="app-container">
         <header>
             <div class="header-content">
@@ -56,6 +59,32 @@
                 </div>
             </div>
 
+            <!-- Daily Stats -->
+            <h2 class="section-title">Daily Insights (Today)</h2>
+            <div class="stats-grid daily-grid">
+                <div class="card stat-card daily-card">
+                    <div class="stat-icon">🔥</div>
+                    <div class="stat-info">
+                        <h3>New Jobs</h3>
+                        <p id="daily-jobs">0</p>
+                    </div>
+                </div>
+                <div class="card stat-card daily-card">
+                    <div class="stat-icon">🎫</div>
+                    <div class="stat-info">
+                        <h3>Admit Cards</h3>
+                        <p id="daily-admit">0</p>
+                    </div>
+                </div>
+                <div class="card stat-card daily-card">
+                    <div class="stat-icon">🏆</div>
+                    <div class="stat-info">
+                        <h3>Results</h3>
+                        <p id="daily-results">0</p>
+                    </div>
+                </div>
+            </div>
+
             <!-- Terminal / Logs -->
             <div class="logs-section">
                 <div class="section-header">
@@ -73,4 +102,5 @@
 
     <script src="app.js"></script>
 </body>
+
 </html>

@@ -6,6 +6,10 @@ const dbStatusEl = document.getElementById('db-status');
 const logsContainer = document.getElementById('logs-container');
 const triggerBtn = document.getElementById('trigger-btn');
 
+const dailyJobsEl = document.getElementById('daily-jobs');
+const dailyAdmitEl = document.getElementById('daily-admit');
+const dailyResultsEl = document.getElementById('daily-results');
+
 let isRunning = false;
 
 function formatTime(isoString) {
@@ -34,6 +38,13 @@ async function fetchStatus() {
         
         dbStatusEl.textContent = data.stats.dbConnected ? 'Connected' : 'Disconnected';
         dbStatusEl.style.color = data.stats.dbConnected ? 'var(--success-color)' : 'var(--error-color)';
+
+        // Update Daily Stats
+        if (data.dailyStats) {
+            dailyJobsEl.textContent = data.dailyStats.latestJobs || 0;
+            dailyAdmitEl.textContent = data.dailyStats.admitCards || 0;
+            dailyResultsEl.textContent = data.dailyStats.results || 0;
+        }
 
         // Update Logs
         renderLogs(data.logs);

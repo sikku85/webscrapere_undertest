@@ -97,3 +97,29 @@ export function updateState(currentState, newItems) {
     });
     return currentState;
 }
+
+export async function getDailyStats() {
+    if (!process.env.MONGODB_URI) return { latestJobs: 0, admitCards: 0, results: 0 };
+    
+    try {
+        const startOfDay = new Date();
+        startOfDay.setHours(0, 0, 0, 0);
+        
+        const stats = await Link.aggregate([
+            { $match: { dateFound: { $gte: startOfDay } } },
+            { $group: { _id: "$category", count: { $sum: 1 } } }
+        ]);
+        
+        const result = { latestJobs: 0, admitCards: 0, results: 0 };
+        stats.forEach(s => {
+            if (s._id === 'Latest Job') result.latestJobs = s.count;
+            if (s._id === 'Admit Card') result.admitCards = s.count;
+            if (s._id === 'Result') result.results = s.count;
+        });
+        
+        return result;
+    } catch (error) {
+        console.error('Error fetching daily stats:', error);
+        return { latestJobs: 0, admitCards: 0, results: 0 };
+    }
+}

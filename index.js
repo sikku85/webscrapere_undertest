@@ -5,7 +5,7 @@ import { fileURLToPath } from 'url';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { scrapeSarkariResult } from './scraper.js';
-import { initDB, loadState, saveNewLinks, filterNewItems, updateState } from './storage.js';
+import { initDB, loadState, saveNewLinks, filterNewItems, updateState, getDailyStats } from './storage.js';
 import { sendNotification } from './notifier.js';
 import cron from 'node-cron';
 
@@ -30,11 +30,13 @@ function log(message) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
-app.get('/api/status', (req, res) => {
+app.get('/api/status', async (req, res) => {
+    const dailyStats = await getDailyStats();
     res.json({
         status: 'active',
         message: 'SarkariResult Scraper Backend is running.',
         stats,
+        dailyStats,
         logs
     });
 });
