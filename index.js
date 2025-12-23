@@ -2,6 +2,7 @@
 import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import mongoose from 'mongoose';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 import { scrapeSarkariResult } from './scraper.js';
@@ -30,13 +31,26 @@ function log(message) {
 
 app.use(express.static(path.join(__dirname, 'public')));
 
+let cachedDailyStats = null;
+let lastCacheTime = 0;
+const CACHE_DURATION = 60 * 1000; // 1 minute
+
 app.get('/api/status', async (req, res) => {
-    const dailyStats = await getDailyStats();
+    // Check dynamic DB status
+    const isConnected = mongoose.connection.readyState === 1;
+    stats.dbConnected = isConnected;
+
+    // Cache Daily Stats
+    if (!cachedDailyStats || (Date.now() - lastCacheTime > CACHE_DURATION)) {
+        cachedDailyStats = await getDailyStats();
+        lastCacheTime = Date.now();
+    }
+
     res.json({
         status: 'active',
         message: 'SarkariResult Scraper Backend is running.',
         stats,
-        dailyStats,
+        dailyStats: cachedDailyStats,
         logs
     });
 });
@@ -65,7 +79,15 @@ if (process.env.NODE_ENV !== 'production') {
     });
 }
 
+let isProcessing = false;
+
 async function run() {
+    if (isProcessing) {
+        log('Skipping run: Previous job still processing.');
+        return;
+    }
+    isProcessing = true;
+    
     log('Running scraper job...');
     const start = Date.now();
     
@@ -140,5 +162,6 @@ async function run() {
     stats.itemsFoundLastRun = newLinksFound;
     stats.lastRunDuration = Date.now() - start;
     stats.lastRun = new Date();
+    isProcessing = false;
 }
 
