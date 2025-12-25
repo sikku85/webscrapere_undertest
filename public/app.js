@@ -26,6 +26,12 @@ function formatTime(isoString) {
     return date.toLocaleString();
 }
 
+function formatTimeOnly(isoString) {
+    if (!isoString) return '';
+    const date = new Date(isoString);
+    return date.toLocaleTimeString('en-IN', { hour: '2-digit', minute: '2-digit', hour12: true });
+}
+
 function updateBadge(status) {
     statusBadge.textContent = status === 'active' ? 'Active' : 'Offline';
     statusBadge.className = `badge ${status === 'active' ? 'active' : 'offline'}`;
@@ -121,7 +127,22 @@ function openModal(title, items) {
             const a = document.createElement('a');
             a.href = item.url;
             a.target = '_blank';
-            a.textContent = item.text;
+            a.target = '_blank';
+            
+            const timeSpan = document.createElement('span');
+            timeSpan.className = 'item-time';
+            timeSpan.textContent = formatTimeOnly(item.dateFound);
+            timeSpan.style.color = 'var(--text-secondary)';
+            timeSpan.style.fontSize = '0.85rem';
+            timeSpan.style.marginLeft = '10px';
+            timeSpan.style.float = 'right';
+
+            a.appendChild(timeSpan);
+            a.childNodes[0].textContent = item.text; // Ensure text is separate from span if needed, or just append
+            
+            // Re-structure to have text and time
+            a.innerHTML = `<span class="item-text">${item.text}</span> <span class="item-time" style="float: right; color: var(--text-secondary); font-size: 0.85rem;">${formatTimeOnly(item.dateFound)}</span>`;
+
             li.appendChild(a);
             modalList.appendChild(li);
         });

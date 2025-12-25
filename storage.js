@@ -102,6 +102,7 @@ export async function getDailyStats() {
     if (!process.env.MONGODB_URI) return { latestJobs: 0, admitCards: 0, results: 0 };
     
     try {
+        await initDB(); // Ensure DB is connected
         const startOfDay = new Date();
         startOfDay.setHours(0, 0, 0, 0);
         
@@ -111,7 +112,7 @@ export async function getDailyStats() {
                 $group: { 
                     _id: "$category", 
                     count: { $sum: 1 },
-                    items: { $push: { text: "$text", url: "$url" } }
+                    items: { $push: { text: "$text", url: "$url", dateFound: "$dateFound" } }
                 } 
             }
         ]);
