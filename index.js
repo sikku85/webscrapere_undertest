@@ -111,6 +111,7 @@ async function run() {
     const categories = [
         { key: 'results', label: 'Result' },
         { key: 'admitCards', label: 'Admit Card' },
+        { key: 'answerKeys', label: 'Answer Key' },
         { key: 'latestJobs', label: 'Latest Job' }
     ];
 

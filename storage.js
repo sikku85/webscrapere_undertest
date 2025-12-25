@@ -119,6 +119,7 @@ export async function getDailyStats() {
         const result = { 
             latestJobs: { count: 0, items: [] }, 
             admitCards: { count: 0, items: [] }, 
+            answerKeys: { count: 0, items: [] },
             results: { count: 0, items: [] } 
         };
 
@@ -135,6 +136,10 @@ export async function getDailyStats() {
                 result.results.count = s.count;
                 result.results.items = s.items;
             }
+            if (s._id === 'Answer Key') {
+                result.answerKeys.count = s.count;
+                result.answerKeys.items = s.items;
+            }
         });
         
         return result;
@@ -143,6 +148,7 @@ export async function getDailyStats() {
         return { 
             latestJobs: { count: 0, items: [] }, 
             admitCards: { count: 0, items: [] }, 
+            answerKeys: { count: 0, items: [] },
             results: { count: 0, items: [] } 
         };
     }

@@ -19,10 +19,11 @@ export async function scrapeSarkariResult() {
     const $ = await fetchHTML(URL);
     if (!$) return null;
 
-    const scrapedData = { results: [], admitCards: [], latestJobs: [] };
+    const scrapedData = { results: [], admitCards: [], answerKeys: [], latestJobs: [] };
     const categories = [
         { title: 'Result', key: 'results' },
         { title: 'Admit Card', key: 'admitCards' },
+        { title: 'Answer Key', key: 'answerKeys' },
         { title: 'Latest Job', key: 'latestJobs' }
     ];
 

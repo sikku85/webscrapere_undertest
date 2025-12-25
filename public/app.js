@@ -8,6 +8,7 @@ const triggerBtn = document.getElementById('trigger-btn');
 
 const dailyJobsEl = document.getElementById('daily-jobs');
 const dailyAdmitEl = document.getElementById('daily-admit');
+const dailyKeysEl = document.getElementById('daily-keys');
 const dailyResultsEl = document.getElementById('daily-results');
 
 // Modal Elements
@@ -51,6 +52,7 @@ async function fetchStatus() {
             currentStats = data.dailyStats; // Store globally
             dailyJobsEl.textContent = data.dailyStats.latestJobs.count || 0;
             dailyAdmitEl.textContent = data.dailyStats.admitCards.count || 0;
+            dailyKeysEl.textContent = data.dailyStats.answerKeys.count || 0;
             dailyResultsEl.textContent = data.dailyStats.results.count || 0;
         }
 
@@ -142,6 +144,10 @@ document.querySelector('.daily-card:nth-child(2)').addEventListener('click', () 
 });
 
 document.querySelector('.daily-card:nth-child(3)').addEventListener('click', () => {
+    if (currentStats) openModal('Answer Keys (Today)', currentStats.answerKeys.items);
+});
+
+document.querySelector('.daily-card:nth-child(4)').addEventListener('click', () => {
     if (currentStats) openModal('Results (Today)', currentStats.results.items);
 });
 
