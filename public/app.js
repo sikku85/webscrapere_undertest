@@ -23,7 +23,7 @@ let isRunning = false;
 function formatTime(isoString) {
     if (!isoString) return 'Never';
     const date = new Date(isoString);
-    return date.toLocaleString();
+    return date.toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
 }
 
 function formatTimeOnly(isoString) {

@@ -23,7 +23,8 @@ let stats = {
 
 const logs = [];
 function log(message) {
-    const msg = `[${new Date().toISOString()}] ${message}`;
+    const timestamp = new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' });
+    const msg = `[${timestamp}] ${message}`;
     console.log(msg);
     logs.unshift(msg); // Add to beginning
     if (logs.length > 50) logs.pop(); // Keep last 50
