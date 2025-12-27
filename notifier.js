@@ -14,15 +14,22 @@ if (token) {
 }
 
 export async function sendNotification(item, category) {
+    // Map category to prefix
+    let prefix = 'UPDATE';
+    if (category === 'Admit Card') prefix = 'ADMITCARD';
+    else if (category === 'Result') prefix = 'RESULT';
+    else if (category === 'Answer Key') prefix = 'ANSWERKEY';
+    else if (category === 'Latest Job') prefix = 'FORM';
+
+    // Construct message: PREFIX URL
+    const message = `${prefix} ${item.url}`;
+
     if (!bot || !chatId) {
-        // User requested ONLY the link
-        const message = item.url;
         console.log(`[Mock Notification] ${message}`);
         return;
     }
 
-    // User requested ONLY the link
-    const message = item.url;
+
     
     try {
         await bot.sendMessage(chatId, message);
