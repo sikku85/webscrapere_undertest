@@ -1,5 +1,6 @@
 
 import express from 'express';
+import axios from 'axios';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import mongoose from 'mongoose';
@@ -146,6 +147,28 @@ async function run() {
                     if (shouldNotify) {
                         await sendNotification(item, cat.label);
                         log(`New Item: ${item.text}`);
+
+                        // Webhook trigger
+                        try {
+                            // Map category to prefix (Duplicate logic from notifier.js)
+                            let prefix = 'UPDATE';
+                            if (cat.label === 'Admit Card') prefix = 'ADMITCARD';
+                            else if (cat.label === 'Result') prefix = 'RESULT';
+                            else if (cat.label === 'Answer Key') prefix = 'ANSWERKEY';
+                            else if (cat.label === 'Latest Job') prefix = 'FORM';
+
+                            const webhookUrl = 'https://n8n.examsofbharat.com/webhook-test/message';
+                            const webhookData = `${prefix} ${item.url}`;
+                            
+                            await axios.get(webhookUrl, {
+                                params: {
+                                    data: webhookData
+                                }
+                            });
+                            log(`Webhook triggered for: ${item.text}`);
+                        } catch (err) {
+                            console.error(`Webhook trigger failed for ${item.text}:`, err.message);
+                        }
                     }
                 }
                 // Save to DB
