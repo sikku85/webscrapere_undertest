@@ -157,7 +157,7 @@ async function run() {
                             else if (cat.label === 'Answer Key') prefix = 'ANSWERKEY';
                             else if (cat.label === 'Latest Job') prefix = 'FORM';
 
-                            const webhookUrl = 'https://n8n.examsofbharat.com/webhook-test/message';
+                            const webhookUrl = 'https://n8n.examsofbharat.com/webhook/message';
                             const webhookData = `${prefix} ${item.url}`;
                             
                             await axios.get(webhookUrl, {
