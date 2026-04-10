@@ -15,7 +15,7 @@ async function fetchHTML(url) {
 // --- Specific Scrapers ---
 
 export async function scrapeSarkariResult() {
-    const URL = 'https://sarkariresult.com.cm/';
+    const URL = 'https://sarkariresult.com';
     const $ = await fetchHTML(URL);
     if (!$) return null;
 
